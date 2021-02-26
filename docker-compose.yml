@@ -1,0 +1,40 @@
+version: '2'
+volumes:
+    influxdb-data:
+    dashboard-data:
+services:
+  influxdb:
+    image: arm64v8/influxdb:1.8.6
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=balena
+      - INFLUXDB_USER=balena
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    volumes:
+      - 'influxdb-data:/var/lib/influxdb'
+    ports:
+      - "8086:8086"
+  dashboard:
+    restart: always
+    build: ./dashboard
+    ports:
+      - "80"
+    volumes:
+      - 'dashboard-data:/data'
+  sensor:
+    privileged: true
+    build: ./sensor
+    restart: always
+    depends_on:
+     - influxdb
+     - dashboard
+  messenger:
+    privileged: true
+    build: ./messenger
+    restart: always
+    ports:
+      - "5000"
+      - "22"
