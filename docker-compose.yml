@@ -38,3 +38,9 @@ services:
     ports:
       - "5000"
       - "22"
+  cron:
+    privileged: true
+    build: ./cron
+    restart: always
+    labels:
+      io.balena.features.supervisor-api: '1'
