@@ -1,0 +1,20 @@
+name: "balena-sense-hat"
+description: "Balena multi-container app using a Raspberry Pi"
+type: "sw.application"
+joinable: false
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: "https://github.com/hferentschik/balena-sense-hat"
+  logo:
+    type: blob.asset
+    data:
+      url: "https://raw.githubusercontent.com/hferentschik/balena-weather/master/images/sense-hat.png"
+data:
+  applicationConfigVariables:
+    - BALENA_HOST_CONFIG_CONNECTIVITY_CHECK: true
+  defaultDeviceType: "raspberrypi4-64"
+  supportedDeviceTypes:
+    - "raspberrypi3-64"
+    - "raspberrypi4-64"
