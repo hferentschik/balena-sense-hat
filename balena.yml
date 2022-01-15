@@ -1,5 +1,5 @@
 name: "balena-sense-hat"
-description: "Balena multi-container app using a Raspberry Pi"
+description: "Balena multi-container app using a Raspberry Pi w/ Sense Hat"
 type: "sw.application"
 joinable: false
 assets:
