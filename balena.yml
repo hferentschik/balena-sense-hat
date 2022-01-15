@@ -10,7 +10,7 @@ assets:
   logo:
     type: blob.asset
     data:
-      url: "https://raw.githubusercontent.com/hferentschik/balena-weather/master/images/sense-hat.png"
+      url: "https://raw.githubusercontent.com/hferentschik/balena-sense-hat/master/images/sense-hat.png"
 data:
   applicationConfigVariables:
     - BALENA_HOST_CONFIG_CONNECTIVITY_CHECK: true
