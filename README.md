@@ -23,6 +23,32 @@ balena push <app-name>
 
 ## Development
 
+### Operations
+
+```sh
+$ balena fleet sense-hat
+== sense-hat
+ID:          1796315
+DEVICE TYPE: raspberrypi4-64
+SLUG:        hardy_ferentschik_balena/sense-hat
+COMMIT:      a27e914bdfb5e86132ea9c65eb6f97d3
+
+$ balena device list --fleet sense-hat
+balena device list --fleet sense-hat
+ID       UUID    DEVICE NAME  DEVICE TYPE     FLEET                              STATUS IS ONLINE SUPERVISOR VERSION OS VERSION           DASHBOARD URL
+13656543 a98625b average-bush raspberrypi4-64 hardy_ferentschik_balena/sense-hat Idle   true      17.8.2             balenaOS 7.4.0+rev10 https://dashboard.balena-cloud.com/devices/a98625b1680f74a5fdc697fd9de047c8/summary
+
+device=a98625b
+balena device logs $device 
+balena device logs $device --service messenger
+balena device logs $device --service messenger --tail
+balena device ssh $device messenger
+balena push sense-hat
+
+# Inspect device-specific host config variables (e.g. dtoverlay, dtparam)
+balena env list --device $device --config
+```
+
 ### Executing code in container
 
 In order to test the code easily, the container uses a trick to allow using [PyCharm](https://www.jetbrains.com/pycharm/) locally and execute the code in the remote container.

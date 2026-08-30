@@ -18,12 +18,14 @@ services:
     ports:
       - "8086:8086"
   dashboard:
-    restart: always
     build: ./dashboard
-    ports:
-      - "80"
+    restart: always
+    expose:
+      - '80'
     volumes:
       - 'dashboard-data:/data'
+    depends_on:
+      - influxdb
   sensor:
     privileged: true
     build: ./sensor
@@ -38,3 +40,20 @@ services:
     ports:
       - "5000"
       - "22"
+  mqtt:
+    build: ./mqtt
+    restart: always
+    ports:
+      - "1883"
+      - "9001"
+  nginx:
+    build: ./nginx
+    ports:
+      - '80:80'
+  telegraf:
+    build: ./telegraf
+    privileged: true
+    restart: always
+    depends_on:
+      - mqtt
+      - influxdb
