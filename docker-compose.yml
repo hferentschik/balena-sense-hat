@@ -4,7 +4,7 @@ volumes:
     dashboard-data:
 services:
   influxdb:
-    image: arm64v8/influxdb:1.8.6
+    image: influxdb:1.8.10
     container_name: influxdb
     restart: always
     environment:

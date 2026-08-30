@@ -1,4 +1,4 @@
-FROM balenalib/raspberrypi4-64:buster
+FROM balenalib/raspberrypi4-64:bookworm
 
 RUN apt-get update \
  && apt-get install -yq \
@@ -26,7 +26,7 @@ RUN git clone https://github.com/RPi-Distro/RTIMULib \
 
 WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install --break-system-packages -r requirements.txt
 
 COPY measure.py measure.py
 

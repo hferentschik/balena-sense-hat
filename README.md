@@ -12,8 +12,12 @@ A [balenaCloud](https://www.balena.io/) project using a Raspberry Pi 4 together 
     curl -X POST -H "Content-Type: application/json" -d '{"message": "hello world"}' $ip:5000/display
     ```
 
-- sensor - the sensor component reads the sensors of the SenseHat and writes it into a [InfluxDB](https://www.influxdata.com/) database.
-- dashboard - [Grafana](https://grafana.com/) dashboard displaying the sensor data.
+- sensor - the sensor component reads the sensors of the SenseHat and writes it into an [InfluxDB](https://www.influxdata.com/) database (`balena-sense`).
+- dashboard - [Grafana](https://grafana.com/) dashboard displaying the sensor data, reachable at `http://<device-ip>/dash/`.
+- influxdb - time-series database backing the dashboard.
+- mqtt - [Mosquitto](https://mosquitto.org/) broker (plain `1883` and websockets `9001`) for publishing sensor readings over MQTT. Currently no service in this repo publishes to it.
+- telegraf - subscribes to MQTT topics `sensors`/`sensors/#` and would write readings into InfluxDB (`weather` database), independent of the `sensor` -> `balena-sense` path. Idle until something publishes to MQTT.
+- nginx - reverse proxy in front of the fleet; routes `/dash/` to the dashboard and everything else to the MQTT websocket listener.
 
 ### Deployment
 
@@ -48,6 +52,41 @@ balena push sense-hat
 # Inspect device-specific host config variables (e.g. dtoverlay, dtparam)
 balena env list --device $device --config
 ```
+
+`balena device ssh` targeting a device by UUID only works for the host OS shell, not individual service
+containers. To SSH into a specific service (e.g. to inspect files live), target the device by local
+IP or `.local` address instead, and pipe the command through stdin rather than passing it as a trailing
+argument:
+
+```sh
+echo "cat /etc/some-file" | balena device ssh 192.168.86.212 messenger
+```
+
+### Testing the messenger API
+
+```sh
+curl -X POST -H "Content-Type: application/json" -d '{"message": "hello"}' http://<device-ip>:5000/display
+```
+
+If nothing appears on the LED matrix, see [Troubleshooting](#troubleshooting) below.
+
+### Troubleshooting
+
+- **LED matrix stuck on / `sensor` and `messenger` crash-looping with `OSError: Cannot detect RPi-Sense FB device`**
+  The Raspberry Pi kernel needs the `rpi-sense` device-tree overlay to expose the Sense HAT's LED matrix as a
+  framebuffer device. Check the device's `dtoverlay` host config variable and make sure `rpi-sense` is included
+  alongside any other overlays (e.g. `vc4-kms-v3d,cma-320`), then reboot the device:
+
+    ```sh
+    balena env list --device $device --config
+    balena env rename <VAR_ID> '"vc4-kms-v3d,cma-320","rpi-sense"' --device --config
+    balena device reboot $device
+    ```
+
+- **Dashboard panels are empty**
+  The Grafana `InfluxDB` datasource must point at the `balena-sense` database (the one `sensor` actually writes
+  to — not `balena`, which is only created empty via the `influxdb` container's `INFLUXDB_DB` env var). Each
+  panel in `dashboard.json` must also reference the datasource by its exact configured name (`InfluxDB`).
 
 ### Executing code in container
 
